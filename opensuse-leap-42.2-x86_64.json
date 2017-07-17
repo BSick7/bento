@@ -137,13 +137,49 @@
       "ssh_wait_timeout": "10000s",
       "type": "qemu",
       "vm_name": "{{ user `template` }}"
+    },
+    {
+      "boot_command": [
+        "<esc><enter><wait>",
+        "linux netsetup=dhcp netdevice=eth0 install=cd:/<wait>",
+        " lang=en_US autoyast=http://{{ .HTTPIP }}:{{ .HTTPPort }}/opensuse-leap-42.2/autoinst.xml<wait>",
+        " textmode=1<wait>",
+        "<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "communicator": "ssh",
+      "cpu": "{{ user `cpus` }}",
+      "disk_size": "{{user `disk_size`}}",
+      "enable_secure_boot": false,
+      "generation": "{{user `hyperv_generation`}}",
+      "http_directory": "http",
+      "iso_checksum": "{{user `iso_checksum`}}",
+      "iso_checksum_type": "{{user `iso_checksum_type`}}",
+      "iso_url": "{{user `mirror`}}/{{user `mirror_directory`}}/{{user `iso_name`}}",
+      "output_directory": "packer-{{user `template`}}-hyperv",
+      "ram_size": "{{user `memory`}}",
+      "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_timeout": "10000s",
+      "ssh_username": "vagrant",
+      "switch_name": "{{user `hyperv_switch`}}",
+      "type": "hyperv-iso",
+      "vm_name": "{{ user `template` }}"
     }
   ],
   "post-processors": [
-    {
-      "output": "builds/{{user `box_basename`}}.{{.Provider}}.box",
-      "type": "vagrant"
-    }
+    [
+      {
+        "output": "builds/{{user `box_basename`}}.{{.Provider}}.box",
+        "type": "vagrant"
+      },
+      {
+        "type": "vagrant-cloud",
+        "box_tag": "brad_sickles/{{ user `template` }}",
+        "version": "{{ user `version` }}"
+      }
+    ]
   ],
   "provisioners": [
     {
@@ -186,6 +222,8 @@
     "headless": "",
     "http_proxy": "{{env `http_proxy`}}",
     "https_proxy": "{{env `https_proxy`}}",
+    "hyperv_generation": "2",
+    "hyperv_switch": "{{env `hyperv_switch`}}",
     "iso_checksum": "ba5af6b0ac4d42d801de642304eb88ca9fd65a61b6c3ff25724182494f288f00",
     "iso_checksum_type": "sha256",
     "iso_name": "openSUSE-Leap-42.2-DVD-x86_64.iso",
