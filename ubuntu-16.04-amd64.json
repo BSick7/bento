@@ -252,10 +252,17 @@
     }
   ],
   "post-processors": [
-    {
-      "output": "builds/{{user `box_basename`}}.{{.Provider}}.box",
-      "type": "vagrant"
-    }
+    [
+      {
+        "type": "vagrant",
+        "output": "builds/{{user `box_basename`}}.{{.Provider}}.box"
+      },
+      {
+        "type": "vagrant-cloud",
+        "box_tag": "brad_sickles/{{ user `template` }}",
+        "version": "{{ user `version` }}"
+      }
+    ]
   ],
   "provisioners": [
     {
@@ -310,7 +317,7 @@
     "no_proxy": "{{env `no_proxy`}}",
     "preseed_path": "ubuntu/preseed-hyperv.cfg",
     "template": "ubuntu-16.04-amd64",
-    "version": "TIMESTAMP"
+    "version": "0.1.{{timestamp}}"
   }
 }
 
